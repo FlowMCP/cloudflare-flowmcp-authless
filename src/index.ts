@@ -31,6 +31,7 @@ export class MyMCP extends McpAgent {
 		console.log("Config:", config);
 /*
 */
+/*
 		// Load schemas from folder
 		const arrayOfSchemas = await SchemaImporter
 			.loadFromFolder(config.cfgSchemaImporter);
@@ -42,18 +43,19 @@ export class MyMCP extends McpAgent {
 				arrayOfSchemas: arrayOfSchemas.map(({ schema }: any) => schema),
 				...config.cfgFilterArrayOfSchemas
 			});
-
+*/
 		console.log("Filtered schemas:", filteredArrayOfSchemas);
+/*
 		FlowMCP
 			.activateServerTools( {
 				server: this.server,
 				schema: arrayOfSchemas[0]['schema'],
 				serverParams: []
 			} )
-
+*/
 
 		this.server.tool(
-			"ping", 
+			"ping2", 
 			{}, 
 			async () => ({
 				content: [{ type: "text", 
