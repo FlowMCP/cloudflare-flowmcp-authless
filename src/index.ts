@@ -1,8 +1,7 @@
 import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { FlowMCP } from "./lib/flowmcp.js";
-import { SchemaImporter } from "./lib/schemaimporter.js";
-import { z } from "zod";
+import { FlowMCP } from "flowmcp";
+import { SchemaImporter } from "schemaimporter";
 
 // Define our MCP agent with tools
 export class MyMCP extends McpAgent {
@@ -58,24 +57,7 @@ export class MyMCP extends McpAgent {
 		for (const schema of filteredArrayOfSchemas) {
 			console.log(`Processing schema: ${schema.name}`);
 
-			// For now, manually register calculator tools from the placeholder schema
-			if (schema.name === "calculator") {
-				console.log("Registering calculator tools manually");
-
-				this.server.tool("adding", { a: z.number(), b: z.number() }, async ({ a, b }) => ({
-					content: [{ type: "text", text: String(a + b) }],
-				}));
-
-				this.server.tool("multiply", { a: z.number(), b: z.number() }, async ({ a, b }) => ({
-					content: [{ type: "text", text: String(a * b) }],
-				}));
-
-				this.server.tool("subtract", { a: z.number(), b: z.number() }, async ({ a, b }) => ({
-					content: [{ type: "text", text: String(a - b) }],
-				}));
-			}
-
-			// Call FlowMCP activation (placeholder for now)
+			// Let FlowMCP handle all tool registration automatically
 			FlowMCP.activateServerTools({
 				server: this.server,
 				schema,
