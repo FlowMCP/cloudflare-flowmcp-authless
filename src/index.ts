@@ -40,13 +40,13 @@ export class MyMCP extends McpAgent {
 			...config.cfgFilterArrayOfSchemas
 		});
 		console.log("Filtered schemas:", filteredArrayOfSchemas);
-
+*/
 		FlowMCP.activateServerTools({
 			server: this.server,
 			schema: pingSchema,
 			serverParams: []
 		});
-*/
+
 		this.server.tool(
 			"ping", 
 			{}, 
