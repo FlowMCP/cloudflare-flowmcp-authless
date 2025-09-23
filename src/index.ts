@@ -42,17 +42,14 @@ export class MyMCP extends McpAgent {
 				arrayOfSchemas: arrayOfSchemas.map(({ schema }: any) => schema),
 				...config.cfgFilterArrayOfSchemas
 			});
-		filteredArrayOfSchemas
-			.forEach( ( schema ) => {
-				FlowMCP
-					.activateServerTools( {
-						server: this.server,
-						schema,
-						serverParams: []
-					} )
-			} )
-		console.log("Filtered schemas:", filteredArrayOfSchemas);
 
+		console.log("Filtered schemas:", filteredArrayOfSchemas);
+		FlowMCP
+			.activateServerTools( {
+				server: this.server,
+				schema: filteredArrayOfSchemas[0],
+				serverParams: []
+			} )
 
 
 		this.server.tool(
