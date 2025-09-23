@@ -1,69 +1,65 @@
 import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { FlowMCP } from "flowmcp";
+import { SchemaImporter } from "schemaimporter";
 
 // Define our MCP agent with tools
 export class MyMCP extends McpAgent {
 	server = new McpServer({
-		name: "Authless Calculator",
+		name: "FlowMCP Schema Server",
 		version: "1.0.0",
 	});
 
 	async init() {
-		// Simple addition tool
-		this.server.tool("add", { a: z.number(), b: z.number() }, async ({ a, b }) => ({
-			content: [{ type: "text", text: String(a + b) }],
-		}));
+		// Load environment configuration
+		const env = (globalThis as any).env || {};
+		const config = {
+			cfgSchemaImporter: {
+				excludeSchemasWithImports: env.SCHEMA_EXCLUDE_IMPORTS === "true",
+				excludeSchemasWithRequiredServerParams: env.SCHEMA_EXCLUDE_SERVER_PARAMS === "true",
+				addAdditionalMetaData: env.SCHEMA_ADD_METADATA === "true"
+			},
+			cfgFilterArrayOfSchemas: {
+				includeNamespaces: env.FILTER_INCLUDE_NAMESPACES ? env.FILTER_INCLUDE_NAMESPACES.split(",") : [],
+				excludeNamespaces: env.FILTER_EXCLUDE_NAMESPACES ? env.FILTER_EXCLUDE_NAMESPACES.split(",") : [],
+				activateTags: env.FILTER_ACTIVATE_TAGS ? env.FILTER_ACTIVATE_TAGS.split(",") : []
+			}
+		};
 
-		// Calculator tool with multiple operations
-		this.server.tool(
-			"calculate",
-			{
-				operation: z.enum(["add", "subtract", "multiply", "divide"]),
-				a: z.number(),
-				b: z.number(),
-			},
-			async ({ operation, a, b }) => {
-				let result: number;
-				switch (operation) {
-					case "add":
-						result = a + b;
-						break;
-					case "subtract":
-						result = a - b;
-						break;
-					case "multiply":
-						result = a * b;
-						break;
-					case "divide":
-						if (b === 0)
-							return {
-								content: [
-									{
-										type: "text",
-										text: "Error: Cannot divide by zero",
-									},
-								],
-							};
-						result = a / b;
-						break;
-				}
-				return { content: [{ type: "text", text: String(result) }] };
-			},
-		);
+		// Load schemas from folder
+		const arrayOfSchemas = await SchemaImporter.loadFromFolder(config.cfgSchemaImporter);
+
+		// Filter schemas
+		const { filteredArrayOfSchemas } = FlowMCP.filterArrayOfSchemas({
+			arrayOfSchemas: arrayOfSchemas.map(({ schema }: any) => schema),
+			...config.cfgFilterArrayOfSchemas
+		});
+
+		// Register tools for each schema
+		for (const schema of filteredArrayOfSchemas) {
+			FlowMCP.activateServerTools({
+				server: this.server,
+				schema,
+				serverParams: []
+			});
+		}
 	}
 }
 
 export default {
 	fetch(request: Request, env: Env, ctx: ExecutionContext) {
 		const url = new URL(request.url);
+		const routePath = env.ROUTE_PATH || "/mcp";
+
+		// Store environment in global for access in MyMCP.init()
+		(globalThis as any).env = env;
 
 		if (url.pathname === "/sse" || url.pathname === "/sse/message") {
 			return MyMCP.serveSSE("/sse").fetch(request, env, ctx);
 		}
 
-		if (url.pathname === "/mcp") {
-			return MyMCP.serve("/mcp").fetch(request, env, ctx);
+		if (url.pathname === routePath) {
+			return MyMCP.serve(routePath).fetch(request, env, ctx);
 		}
 
 		return new Response("Not found", { status: 404 });

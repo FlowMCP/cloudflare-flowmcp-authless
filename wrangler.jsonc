@@ -24,5 +24,14 @@
 	},
 	"observability": {
 		"enabled": true
+	},
+	"vars": {
+		"ROUTE_PATH": "/mcp",
+		"SCHEMA_EXCLUDE_IMPORTS": "true",
+		"SCHEMA_EXCLUDE_SERVER_PARAMS": "true",
+		"SCHEMA_ADD_METADATA": "false",
+		"FILTER_INCLUDE_NAMESPACES": "",
+		"FILTER_EXCLUDE_NAMESPACES": "",
+		"FILTER_ACTIVATE_TAGS": ""
 	}
 }
