@@ -47,6 +47,15 @@ export class MyMCP extends McpAgent {
 			serverParams: []
 		});
 
+		this.server.tool(
+			"ping", 
+			{}, 
+			async () => ({
+				content: [{ type: "text", 
+				text: "pong" }],
+			})
+		)
+
 
 		// Register tools for each schema
 		console.log(`Registering tools for ${filteredArrayOfSchemas.length} schemas`);
