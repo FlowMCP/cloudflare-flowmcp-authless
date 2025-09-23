@@ -29,7 +29,7 @@ export class MyMCP extends McpAgent {
 			}
 		};
 		console.log("Config:", config);
-
+/*
 		// Load schemas from folder
 		const arrayOfSchemas = await SchemaImporter.loadFromFolder(config.cfgSchemaImporter);
 		console.log("Loaded schemas:", arrayOfSchemas);
@@ -46,7 +46,7 @@ export class MyMCP extends McpAgent {
 			schema: pingSchema,
 			serverParams: []
 		});
-
+*/
 		this.server.tool(
 			"ping", 
 			{}, 
@@ -56,7 +56,7 @@ export class MyMCP extends McpAgent {
 			})
 		)
 
-
+/*
 		// Register tools for each schema
 		console.log(`Registering tools for ${filteredArrayOfSchemas.length} schemas`);
 		for (const schema of filteredArrayOfSchemas) {
@@ -68,6 +68,7 @@ export class MyMCP extends McpAgent {
 				serverParams: []
 			});
 		}
+*/
 		console.log("Tool registration completed");
 	}
 }
