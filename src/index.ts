@@ -47,7 +47,7 @@ export class MyMCP extends McpAgent {
 		FlowMCP
 			.activateServerTools( {
 				server: this.server,
-				schema: filteredArrayOfSchemas[0],
+				schema: arrayOfSchemas[0]['schema'],
 				serverParams: []
 			} )
 
