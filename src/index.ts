@@ -40,7 +40,7 @@ export class MyMCP extends McpAgent {
 		for (const schema of filteredArrayOfSchemas) {
 			// For now, manually register calculator tools from the placeholder schema
 			if (schema.name === "calculator") {
-				this.server.tool("add", { a: z.number(), b: z.number() }, async ({ a, b }) => ({
+				this.server.tool("adding", { a: z.number(), b: z.number() }, async ({ a, b }) => ({
 					content: [{ type: "text", text: String(a + b) }],
 				}));
 
