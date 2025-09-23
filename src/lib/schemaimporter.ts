@@ -9,10 +9,12 @@ export class SchemaImporter {
         excludeSchemasWithRequiredServerParams?: boolean;
         addAdditionalMetaData?: boolean;
     }): Promise<Array<{ schema: any }>> {
+        console.log("SchemaImporter.loadFromFolder called with config:", config);
+
         // Placeholder implementation - return a sample calculator schema
         const calculatorSchema = {
             name: "calculator",
-            description: "Simple calculator operations",
+            description: "Simple calculator operations from placeholder SchemaImporter",
             tools: [
                 {
                     name: "add",
@@ -37,10 +39,24 @@ export class SchemaImporter {
                         },
                         required: ["a", "b"]
                     }
+                },
+                {
+                    name: "subtract",
+                    description: "Subtract two numbers",
+                    inputSchema: {
+                        type: "object",
+                        properties: {
+                            a: { type: "number" },
+                            b: { type: "number" }
+                        },
+                        required: ["a", "b"]
+                    }
                 }
             ]
         };
 
-        return [{ schema: calculatorSchema }];
+        const result = [{ schema: calculatorSchema }];
+        console.log("SchemaImporter returning schemas:", result);
+        return result;
     }
 }

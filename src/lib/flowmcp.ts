@@ -8,8 +8,11 @@ export class FlowMCP {
         excludeNamespaces?: string[];
         activateTags?: string[];
     }): { filteredArrayOfSchemas: any[] } {
+        console.log("FlowMCP.filterArrayOfSchemas called with:", config);
         // Simple passthrough for now - return all schemas
-        return { filteredArrayOfSchemas: config.arrayOfSchemas };
+        const result = { filteredArrayOfSchemas: config.arrayOfSchemas };
+        console.log("FlowMCP.filterArrayOfSchemas returning:", result);
+        return result;
     }
 
     static activateServerTools(config: {

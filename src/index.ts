@@ -11,35 +11,57 @@ export class MyMCP extends McpAgent {
 		version: "1.0.0",
 	});
 
-	async init() {
-		// Load environment configuration
-		const env = (globalThis as any).env || {};
+	private static initialized = false;
+	private static environmentVars: any = {};
+
+	static setEnvironment(env: any) {
+		this.environmentVars = env;
+	}
+
+	async init(env?: any) {
+		// Prevent multiple initializations
+		if (MyMCP.initialized) {
+			return;
+		}
+		MyMCP.initialized = true;
+		// Load environment configuration with defaults
+		const envVars = env || MyMCP.environmentVars || (globalThis as any).env || {};
+		console.log("Environment variables:", envVars);
+
 		const config = {
 			cfgSchemaImporter: {
-				excludeSchemasWithImports: env.SCHEMA_EXCLUDE_IMPORTS === "true",
-				excludeSchemasWithRequiredServerParams: env.SCHEMA_EXCLUDE_SERVER_PARAMS === "true",
-				addAdditionalMetaData: env.SCHEMA_ADD_METADATA === "true"
+				excludeSchemasWithImports: (envVars.SCHEMA_EXCLUDE_IMPORTS || "true") === "true",
+				excludeSchemasWithRequiredServerParams: (envVars.SCHEMA_EXCLUDE_SERVER_PARAMS || "true") === "true",
+				addAdditionalMetaData: (envVars.SCHEMA_ADD_METADATA || "false") === "true"
 			},
 			cfgFilterArrayOfSchemas: {
-				includeNamespaces: env.FILTER_INCLUDE_NAMESPACES ? env.FILTER_INCLUDE_NAMESPACES.split(",") : [],
-				excludeNamespaces: env.FILTER_EXCLUDE_NAMESPACES ? env.FILTER_EXCLUDE_NAMESPACES.split(",") : [],
-				activateTags: env.FILTER_ACTIVATE_TAGS ? env.FILTER_ACTIVATE_TAGS.split(",") : []
+				includeNamespaces: envVars.FILTER_INCLUDE_NAMESPACES ? envVars.FILTER_INCLUDE_NAMESPACES.split(",") : [],
+				excludeNamespaces: envVars.FILTER_EXCLUDE_NAMESPACES ? envVars.FILTER_EXCLUDE_NAMESPACES.split(",") : [],
+				activateTags: envVars.FILTER_ACTIVATE_TAGS ? envVars.FILTER_ACTIVATE_TAGS.split(",") : []
 			}
 		};
+		console.log("Config:", config);
 
 		// Load schemas from folder
 		const arrayOfSchemas = await SchemaImporter.loadFromFolder(config.cfgSchemaImporter);
+		console.log("Loaded schemas:", arrayOfSchemas);
 
 		// Filter schemas
 		const { filteredArrayOfSchemas } = FlowMCP.filterArrayOfSchemas({
 			arrayOfSchemas: arrayOfSchemas.map(({ schema }: any) => schema),
 			...config.cfgFilterArrayOfSchemas
 		});
+		console.log("Filtered schemas:", filteredArrayOfSchemas);
 
 		// Register tools for each schema
+		console.log(`Registering tools for ${filteredArrayOfSchemas.length} schemas`);
 		for (const schema of filteredArrayOfSchemas) {
+			console.log(`Processing schema: ${schema.name}`);
+
 			// For now, manually register calculator tools from the placeholder schema
 			if (schema.name === "calculator") {
+				console.log("Registering calculator tools manually");
+
 				this.server.tool("adding", { a: z.number(), b: z.number() }, async ({ a, b }) => ({
 					content: [{ type: "text", text: String(a + b) }],
 				}));
@@ -47,14 +69,20 @@ export class MyMCP extends McpAgent {
 				this.server.tool("multiply", { a: z.number(), b: z.number() }, async ({ a, b }) => ({
 					content: [{ type: "text", text: String(a * b) }],
 				}));
+
+				this.server.tool("subtract", { a: z.number(), b: z.number() }, async ({ a, b }) => ({
+					content: [{ type: "text", text: String(a - b) }],
+				}));
 			}
 
+			// Call FlowMCP activation (placeholder for now)
 			FlowMCP.activateServerTools({
 				server: this.server,
 				schema,
 				serverParams: []
 			});
 		}
+		console.log("Tool registration completed");
 	}
 }
 
@@ -63,8 +91,8 @@ export default {
 		const url = new URL(request.url);
 		const routePath = env.ROUTE_PATH || "/mcp";
 
-		// Store environment in global for access in MyMCP.init()
-		(globalThis as any).env = env;
+		// Set environment variables for MyMCP initialization
+		MyMCP.setEnvironment(env);
 
 		if (url.pathname === "/sse" || url.pathname === "/sse/message") {
 			return MyMCP.serveSSE("/sse").fetch(request, env, ctx);
