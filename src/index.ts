@@ -47,7 +47,7 @@ export class MyMCP extends McpAgent {
 				addAdditionalMetaData: false,
 				outputType: 'onlySchema' 
 			} )
-
+ 
 		const { filteredArrayOfSchemas } = FlowMCP
 			.filterArrayOfSchemas({
 				arrayOfSchemas,
