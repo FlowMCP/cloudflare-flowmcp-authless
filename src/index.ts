@@ -61,7 +61,7 @@ export class MyMCP extends McpAgent {
 		const { filteredArrayOfSchemas } = FlowMCP
 			.filterArrayOfSchemas({
 				arrayOfSchemas,
-				includeNamespaces: ['cryptocompare', 'coingecko'],
+				includeNamespaces: [],
 				excludeNamespaces: [],
 				activateTags: []
 			} )
