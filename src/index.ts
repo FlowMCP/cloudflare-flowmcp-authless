@@ -43,13 +43,13 @@ export class MyMCP extends McpAgent {
 			excludeSchemasWithRequiredServerParams: true,
 			addAdditionalMetaData: false,
 		});
-
+/*
 			FlowMCP.activateServerTools( {
 				server: this.server,
 				schema: arrayOfSchemas[0]['schema'],
 				serverParams: []
 			} );
-
+*/
 
 
 /*
