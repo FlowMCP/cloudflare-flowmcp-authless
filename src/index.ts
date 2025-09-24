@@ -1,8 +1,7 @@
 import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { FlowMCP } from "flowmcp";
-// import { arrayOfSchemaPaths } from "./schema-paths.mjs";
-import { schema as pingSchema } from "../custom-schemas/ping.mjs";
+
 import { SchemaImporter } from 'schemaimporter'
 
 
@@ -48,6 +47,7 @@ export class MyMCP extends McpAgent {
 				addAdditionalMetaData: false,
 				outputType: 'onlySchema' 
 			} )
+
 		const { filteredArrayOfSchemas } = FlowMCP
 			.filterArrayOfSchemas({
 				arrayOfSchemas,
