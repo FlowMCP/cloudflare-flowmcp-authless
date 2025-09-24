@@ -50,11 +50,6 @@ export class MyMCP extends McpAgent {
 				serverParams: []
 			} );
 
-			FlowMCP.activateServerTools( {
-				server: this.server,
-				schema: arrayOfSchemas[1]['schema'],
-				serverParams: []
-			} );
 
 
 /*
