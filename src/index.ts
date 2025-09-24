@@ -50,13 +50,14 @@ export class MyMCP extends McpAgent {
 		console.log( 'Start import...')
 		// @ts-ignore - loadFromFolderStatic exists but no TypeScript definitions
 		const arrayOfSchemas = await SchemaImporter
-			.loadFromFolderStatic( { 
+			.loadFromFolderStatic( {
 				excludeSchemasWithImports: true,
 				excludeSchemasWithRequiredServerParams: true,
 				addAdditionalMetaData: false,
-				outputType: 'onlySchema' 
+				outputType: 'onlySchema'
 			} )
- console.log( 'B')
+		console.log( 'B - arrayOfSchemas count:', arrayOfSchemas.length)
+
 		const { filteredArrayOfSchemas } = FlowMCP
 			.filterArrayOfSchemas({
 				arrayOfSchemas,
@@ -64,14 +65,21 @@ export class MyMCP extends McpAgent {
 				excludeNamespaces: [],
 				activateTags: []
 			} )
- console.log( 'C')
+ console.log( 'C - filteredArrayOfSchemas count:', filteredArrayOfSchemas.length)
 		for( const schema of filteredArrayOfSchemas ) {
-console.log( 'D' )
-			FlowMCP.activateServerTools({
-				server: this.server,
-				schema,
-				serverParams: []
-			} )
+			console.log( 'D - Processing schema:', schema.namespace || 'unknown' )
+			try {
+				FlowMCP.activateServerTools({
+					server: this.server,
+					schema,
+					serverParams: []
+				} )
+				console.log( 'E - Schema activated successfully' )
+			} catch (error) {
+				console.error('Error activating schema:', error)
+				console.error('Error stack:', error.stack)
+				throw error
+			}
 		}
 
 		console.log( 'Import finished' )
