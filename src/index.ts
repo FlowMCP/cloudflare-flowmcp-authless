@@ -9,7 +9,7 @@ import { SchemaImporter } from 'schemaimporter'
 // Define our MCP agent with tools
 export class MyMCP extends McpAgent {
 	private _server?: McpServer;
-
+ 
 	get server() {
 		if (!this._server) {
 			this._server = new McpServer({
