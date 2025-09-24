@@ -29,7 +29,7 @@ export class MyMCP extends McpAgent {
 			}
 		};
 		console.log("Config:", config);
-/*
+
 		const arrayOfSchemas = await SchemaImporter
 			.loadFromFolder( {
 				excludeSchemasWithImports: true,
@@ -39,12 +39,12 @@ export class MyMCP extends McpAgent {
 		
 		const { filteredArrayOfSchemas } = FlowMCP
 			.filterArrayOfSchemas( {
-				'arrayOfSchemas': arrayOfSchemas.map( ( { schema } ) => { return schema } ),
+				'arrayOfSchemas': arrayOfSchemas.map(({ schema }: any) => schema),
 				includeNamespaces: [],
 				excludeNamespaces: [],
 				activateTags: []
 			} )
-*/
+
 /*
 */
 /*
