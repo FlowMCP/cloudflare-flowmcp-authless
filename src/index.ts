@@ -95,12 +95,18 @@ export class MyMCP extends McpAgent {
 			serverParams: []
 		});
 */
+/*
 		const arrayOfSchemas = await SchemaImporter.loadFromFolder({
 			excludeSchemasWithImports: true,
 			excludeSchemasWithRequiredServerParams: true,
 			addAdditionalMetaData: false,
 		});
-
+*/
+			FlowMCP.activateServerTools({
+				server: this.server,
+				schema: pingSchema,
+				serverParams: []
+			});
 
 		this.server.tool("ping4", {}, async () => ({
 			content: [{ type: "text", text: "pong" }],
