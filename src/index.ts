@@ -40,15 +40,31 @@ export class MyMCP extends McpAgent {
 		};
 		console.log("Config:", config);
 
-console.log( 'Prepare!!!')
-		const arrayOfSchemas = await (SchemaImporter as any)
-			.loadFromFolder({
-				outputType: 'onlySchema',
-				excludeSchemasWithImports: config.cfgSchemaImporter.excludeSchemasWithImports,
-				excludeSchemasWithRequiredServerParams: config.cfgSchemaImporter.excludeSchemasWithRequiredServerParams
-			});
-	console.log( 'Loaded schemas:', arrayOfSchemas.length )
-		
+		console.log( 'Start import...')
+		const arrayOfSchemas = await SchemaImporter
+			.loadFromFolderStatic( { 
+				excludeSchemasWithImports: true,
+				excludeSchemasWithRequiredServerParams: true,
+				addAdditionalMetaData: false,
+				outputType: 'onlySchema' 
+			} )
+		const { filteredArrayOfSchemas } = FlowMCP
+			.filterArrayOfSchemas({
+				arrayOfSchemas,
+				includeNamespaces: ['cryptocompare', 'coingecko'],
+				excludeNamespaces: [],
+				activateTags: []
+			} )
+
+		for( const schema of filteredArrayOfSchemas ) {
+			FlowMCP.activateServerTools({
+				server: this.server,
+				schema,
+				serverParams: []
+			} )
+		}
+
+		console.log( 'Import finished' )
 
 
 /*
