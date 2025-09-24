@@ -1,10 +1,10 @@
 import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { FlowMCP } from "flowmcp";
-import { arrayOfSchemaPaths } from "./schema-paths.mjs";
+// import { arrayOfSchemaPaths } from "./schema-paths.mjs";
 import { schema as pingSchema } from "../custom-schemas/ping.mjs";
-
-
+import { SchemaImporter } from 'schemaimporter'
+import { schema as defilama } from 'schemaimporter/schemas/v1.2.0/defilama/api.mjs'
 
 
 // Define our MCP agent with tools
@@ -41,6 +41,14 @@ export class MyMCP extends McpAgent {
 		};
 		console.log("Config:", config);
 
+		FlowMCP.activateServerTools( {
+			server: this.server,
+			schema: defilama,
+			serverParams: []
+		} );
+
+
+/*
 		// Load schemas using dynamic imports (Cloudflare Workers compatible)
 		const arrayOfSchemas = await Promise.all(
 			arrayOfSchemaPaths.map(async (path) => {
@@ -48,13 +56,17 @@ export class MyMCP extends McpAgent {
 				return { schema: module.schema, absolutePath: path };
 			})
 		);
+*/
 
+		// const schema = await import( 'schemaimporter/schemas/v1.2.0/defilama/api.mjs' )
+/*
+		
 			FlowMCP.activateServerTools( {
 				server: this.server,
 				schema: arrayOfSchemas[0]['schema'],
 				serverParams: []
 			} );
-
+*/
 /*
 			FlowMCP.activateServerTools( {
 				server: this.server,
