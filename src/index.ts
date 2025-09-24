@@ -4,7 +4,6 @@ import { FlowMCP } from "flowmcp";
 // import { arrayOfSchemaPaths } from "./schema-paths.mjs";
 import { schema as pingSchema } from "../custom-schemas/ping.mjs";
 import { SchemaImporter } from 'schemaimporter'
-// import { schema as defilama } from 'schemaimporter/schemas/v1.2.0/defilama/api.mjs'
 
 
 // Define our MCP agent with tools
@@ -41,13 +40,31 @@ export class MyMCP extends McpAgent {
 		};
 		console.log("Config:", config);
 
+		const schemas = await SchemaImporter
+			.loadFromFolderWithImport( {
+				schemaRootFolder: "./../schemas/v1.2.0/",
+				excludeSchemasWithImports: true,
+				excludeSchemasWithRequiredServerParams: true,
+				addAdditionalMetaData: false,
+				outputType: 'onlySchema'
+			} )
 
-		const { schema: defilama } = await import( 'schemaimporter/schemas/v1.2.0/defilama/coins.mjs' )
-		FlowMCP.activateServerTools( {
-			server: this.server,
-			schema: defilama,
-			serverParams: []
-		} );
+		const { filteredArrayOfSchemas } = FlowMCP
+			.filterArrayOfSchemas({
+				arrayOfSchemas: schemas,
+				includeNamespaces: ['cryptocompare', 'coingecko'],
+				excludeNamespaces: [],
+				activateTags: []
+			} )
+
+		for( const schema of filteredArrayOfSchemas ) {
+			FlowMCP.activateServerTools( {
+				server: this.server,
+				schema,
+				serverParams: []
+			} )
+		}
+		
 
 
 /*
@@ -124,13 +141,9 @@ export class MyMCP extends McpAgent {
 			addAdditionalMetaData: false,
 		});
 */
-		FlowMCP.activateServerTools({
-			server: this.server,
-			schema: pingSchema,
-			serverParams: []
-		});
 
-		this.server.tool("ping4", {}, async () => ({
+
+		this.server.tool("ping5", {}, async () => ({
 			content: [{ type: "text", text: "pong" }],
 		}));
 
