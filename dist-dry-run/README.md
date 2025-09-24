@@ -1,1 +1,0 @@
-This folder contains the built output assets for the worker "remote-mcp-server-authless" generated at 2025-09-24T22:30:39.692Z.
