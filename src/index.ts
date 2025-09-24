@@ -99,7 +99,7 @@ export class MyMCP extends McpAgent {
 			serverParams: []
 		});
 
-		this.server.tool("ping2", {}, async () => ({
+		this.server.tool("ping3", {}, async () => ({
 			content: [{ type: "text", text: "pong" }],
 		}));
 
