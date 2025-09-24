@@ -48,6 +48,13 @@ export class MyMCP extends McpAgent {
 				return { schema: module.schema, absolutePath: path };
 			})
 		);
+
+			FlowMCP.activateServerTools( {
+				server: this.server,
+				schema: arrayOfSchemas[0]['schema'],
+				serverParams: []
+			} );
+
 /*
 			FlowMCP.activateServerTools( {
 				server: this.server,
