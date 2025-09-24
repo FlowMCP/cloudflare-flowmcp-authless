@@ -23,7 +23,8 @@
 		]
 	},
 	"observability": {
-		"enabled": true
+		"enabled": true,
+		"head_sampling_rate": 1
 	},
 	"vars": {
 		"ROUTE_PATH": "/mcp",
