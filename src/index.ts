@@ -92,13 +92,13 @@ export class MyMCP extends McpAgent {
 				serverParams: []
 			} )
 */
-
+/*
 		FlowMCP.activateServerTools({
 			server: this.server,
 			'schema': arrayOfSchemas[0]['schema'],
 			serverParams: []
 		});
-
+*/
 		this.server.tool("ping3", {}, async () => ({
 			content: [{ type: "text", text: "pong" }],
 		}));
