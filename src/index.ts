@@ -18,36 +18,52 @@ export class MyMCP extends McpAgent {
 
 		const config = {
 			cfgSchemaImporter: {
-				excludeSchemasWithImports: (env.SCHEMA_EXCLUDE_IMPORTS || "true") === "true",
-				excludeSchemasWithRequiredServerParams: (env.SCHEMA_EXCLUDE_SERVER_PARAMS || "true") === "true",
-				addAdditionalMetaData: (env.SCHEMA_ADD_METADATA || "false") === "true"
+				excludeSchemasWithImports:
+					(env.SCHEMA_EXCLUDE_IMPORTS || "true") === "true",
+				excludeSchemasWithRequiredServerParams:
+					(env.SCHEMA_EXCLUDE_SERVER_PARAMS || "true") === "true",
+				addAdditionalMetaData: (env.SCHEMA_ADD_METADATA || "false") === "true",
 			},
 			cfgFilterArrayOfSchemas: {
-				includeNamespaces: env.FILTER_INCLUDE_NAMESPACES ? env.FILTER_INCLUDE_NAMESPACES.split(",") : [],
-				excludeNamespaces: env.FILTER_EXCLUDE_NAMESPACES ? env.FILTER_EXCLUDE_NAMESPACES.split(",") : [],
-				activateTags: env.FILTER_ACTIVATE_TAGS ? env.FILTER_ACTIVATE_TAGS.split(",") : []
-			}
+				includeNamespaces: env.FILTER_INCLUDE_NAMESPACES
+					? env.FILTER_INCLUDE_NAMESPACES.split(",")
+					: [],
+				excludeNamespaces: env.FILTER_EXCLUDE_NAMESPACES
+					? env.FILTER_EXCLUDE_NAMESPACES.split(",")
+					: [],
+				activateTags: env.FILTER_ACTIVATE_TAGS
+					? env.FILTER_ACTIVATE_TAGS.split(",")
+					: [],
+			},
 		};
 		console.log("Config:", config);
 
-		const arrayOfSchemas = await SchemaImporter
-			.loadFromFolder( {
-				excludeSchemasWithImports: true,
-				excludeSchemasWithRequiredServerParams: true,
-				addAdditionalMetaData: false
-			} )
-		
-		const { filteredArrayOfSchemas } = FlowMCP
-			.filterArrayOfSchemas( {
-				'arrayOfSchemas': arrayOfSchemas.map(({ schema }: any) => schema),
-				includeNamespaces: [],
-				excludeNamespaces: [],
-				activateTags: []
-			} )
+		const arrayOfSchemas = await SchemaImporter.loadFromFolder({
+			excludeSchemasWithImports: true,
+			excludeSchemasWithRequiredServerParams: true,
+			addAdditionalMetaData: false,
+		});
+
+		for( const { schema } of arrayOfSchemas ) {
+			FlowMCP.activateServerTools( {
+				server: this.server,
+				schema,
+				serverParams: []
+			} );
+		}
+
 
 /*
+		const { filteredArrayOfSchemas } = FlowMCP.filterArrayOfSchemas({
+			arrayOfSchemas: arrayOfSchemas.map(({ schema }: any) => schema),
+			includeNamespaces: [],
+			excludeNamespaces: [],
+			activateTags: [],
+		});
 */
-/*
+		/*
+		 */
+		/*
 		// Load schemas from folder
 		const arrayOfSchemas = await SchemaImporter
 			.loadFromFolder(config.cfgSchemaImporter);
@@ -61,7 +77,7 @@ export class MyMCP extends McpAgent {
 			});
 */
 		// console.log("Filtered schemas:", filteredArrayOfSchemas);
-/*
+		/*
 		FlowMCP
 			.activateServerTools( {
 				server: this.server,
@@ -70,16 +86,11 @@ export class MyMCP extends McpAgent {
 			} )
 */
 
-		this.server.tool(
-			"ping2", 
-			{}, 
-			async () => ({
-				content: [{ type: "text", 
-				text: "pong" }],
-			})
-		)
+		this.server.tool("ping2", {}, async () => ({
+			content: [{ type: "text", text: "pong" }],
+		}));
 
-/*
+		/*
 		// Register tools for each schema
 		console.log(`Registering tools for ${filteredArrayOfSchemas.length} schemas`);
 		for (const schema of filteredArrayOfSchemas) {
