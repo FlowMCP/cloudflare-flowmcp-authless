@@ -4,7 +4,7 @@ import { FlowMCP } from "flowmcp";
 // import { arrayOfSchemaPaths } from "./schema-paths.mjs";
 import { schema as pingSchema } from "../custom-schemas/ping.mjs";
 import { SchemaImporter } from 'schemaimporter'
-import { schema as defilama } from 'schemaimporter/schemas/v1.2.0/defilama/api.mjs'
+// import { schema as defilama } from 'schemaimporter/schemas/v1.2.0/defilama/api.mjs'
 
 
 // Define our MCP agent with tools
@@ -41,6 +41,8 @@ export class MyMCP extends McpAgent {
 		};
 		console.log("Config:", config);
 
+
+		const { schema: defilama } = await import( 'schemaimporter/schemas/v1.2.0/defilama/coins.mjs' )
 		FlowMCP.activateServerTools( {
 			server: this.server,
 			schema: defilama,
