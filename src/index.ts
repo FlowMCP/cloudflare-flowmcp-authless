@@ -55,7 +55,7 @@ export class MyMCP extends McpAgent {
 				excludeNamespaces: [],
 				activateTags: []
 			} )
-
+ 
 		for( const schema of filteredArrayOfSchemas ) {
 			FlowMCP.activateServerTools({
 				server: this.server,
