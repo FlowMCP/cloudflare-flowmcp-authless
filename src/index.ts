@@ -40,29 +40,70 @@ export class MyMCP extends McpAgent {
 		};
 		console.log("Config:", config);
 
-		const schemas = await SchemaImporter
-			.loadFromFolderWithImport( {
-				schemaRootFolder: "./../schemas/v1.2.0/",
-				excludeSchemasWithImports: true,
-				excludeSchemasWithRequiredServerParams: true,
-				addAdditionalMetaData: false,
-				outputType: 'onlySchema'
-			} )
+		console.log("Starting schema import - using direct data import for Cloudflare Workers...");
 
-		const { filteredArrayOfSchemas } = FlowMCP
-			.filterArrayOfSchemas({
-				arrayOfSchemas: schemas,
-				includeNamespaces: ['cryptocompare', 'coingecko'],
-				excludeNamespaces: [],
-				activateTags: []
-			} )
+		let schemas = [];
 
-		for( const schema of filteredArrayOfSchemas ) {
-			FlowMCP.activateServerTools( {
-				server: this.server,
-				schema,
-				serverParams: []
-			} )
+		try {
+			// Import schema paths directly (bypassing SchemaImporter's relative path issues)
+			const { allSchemaPaths } = await import('schemaimporter/src/data/all-schema-paths.mjs');
+
+			// Replicate the filtering logic from loadFromFolderWithImport
+			const schemaRootFolder = "./../schemas/v1.2.0/";
+			const filteredPaths = allSchemaPaths
+				.filter((item: any) => item.relativePath.includes(schemaRootFolder.replace('./../schemas/', '')))
+				.filter((item: any) => config.cfgSchemaImporter.excludeSchemasWithImports ? !item.hasImport : true)
+				.filter((item: any) => config.cfgSchemaImporter.excludeSchemasWithRequiredServerParams ? (item.requiredServerParams.length === 0) : true);
+
+			console.log(`Found ${filteredPaths.length} schema paths after filtering`);
+
+			// Import schemas using modulImportPath (works in Cloudflare Workers)
+			for (const pathInfo of filteredPaths) {
+				try {
+					const module = await import(pathInfo.modulImportPath);
+					if (module.schema) {
+						schemas.push(module.schema);
+					}
+				} catch (importError: any) {
+					console.error(`Failed to import ${pathInfo.modulImportPath}:`, importError?.message || importError);
+				}
+			}
+
+			console.log(`Successfully imported ${schemas.length} schemas`);
+
+			// Now use FlowMCP to filter the schemas
+			const { filteredArrayOfSchemas } = FlowMCP
+				.filterArrayOfSchemas({
+					arrayOfSchemas: schemas,
+					includeNamespaces: ['coingecko-com', 'coinmarketcap-com', 'defilama'],
+					excludeNamespaces: [],
+					activateTags: []
+				})
+
+			console.log(`Filtered to ${filteredArrayOfSchemas.length} schemas`);
+
+			// Register filtered schemas
+			if (filteredArrayOfSchemas.length > 0) {
+				console.log("Registering schemas as MCP tools...");
+				for( const schema of filteredArrayOfSchemas ) {
+					console.log(`Registering schema: ${schema.name || schema.namespace || 'unknown'}`);
+					try {
+						FlowMCP.activateServerTools( {
+							server: this.server,
+							schema,
+							serverParams: []
+						} )
+					} catch (error) {
+						console.error(`Error registering schema:`, error);
+					}
+				}
+				console.log("Schema registration complete");
+			} else {
+				console.log("No matching schemas found after filtering");
+			}
+
+		} catch (error) {
+			console.error("Error during schema import process:", error);
 		}
 		
 
@@ -143,8 +184,9 @@ export class MyMCP extends McpAgent {
 */
 
 
-		this.server.tool("ping5", {}, async () => ({
-			content: [{ type: "text", text: "pong" }],
+		// Always register a basic ping tool for testing
+		this.server.tool("ping", {}, async () => ({
+			content: [{ type: "text", text: "pong - FlowMCP Server is running!" }],
 		}));
 
 		/*
