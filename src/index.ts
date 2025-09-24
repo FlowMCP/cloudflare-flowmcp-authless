@@ -40,32 +40,33 @@ export class MyMCP extends McpAgent {
 		};
 		console.log("Config:", config);
 
-		console.log("Starting schema import - using direct data import for Cloudflare Workers...");
+		console.log("Starting schema import - using wrangler module rules for dynamic imports...");
 
 		let schemas = [];
 
 		try {
-			// Import schema paths directly (bypassing SchemaImporter's relative path issues)
-			const { allSchemaPaths } = await import('schemaimporter/src/data/all-schema-paths.mjs');
+			// Get schema paths with metadata using loadFromFolderWithImport
+			console.log("Loading schema paths...");
+			const schemaPaths = await (SchemaImporter as any)
+				.loadFromFolderWithImport({
+					outputType: 'onlyPath',
+					excludeSchemasWithImports: config.cfgSchemaImporter.excludeSchemasWithImports,
+					excludeSchemasWithRequiredServerParams: config.cfgSchemaImporter.excludeSchemasWithRequiredServerParams
+				});
 
-			// Replicate the filtering logic from loadFromFolderWithImport
-			const schemaRootFolder = "./../schemas/v1.2.0/";
-			const filteredPaths = allSchemaPaths
-				.filter((item: any) => item.relativePath.includes(schemaRootFolder.replace('./../schemas/', '')))
-				.filter((item: any) => config.cfgSchemaImporter.excludeSchemasWithImports ? !item.hasImport : true)
-				.filter((item: any) => config.cfgSchemaImporter.excludeSchemasWithRequiredServerParams ? (item.requiredServerParams.length === 0) : true);
+			console.log(`Found ${schemaPaths.length} schema paths`);
 
-			console.log(`Found ${filteredPaths.length} schema paths after filtering`);
-
-			// Import schemas using modulImportPath (works in Cloudflare Workers)
-			for (const pathInfo of filteredPaths) {
+			// Import schemas using modulImportPath (should work with wrangler module rules)
+			for (const pathInfo of schemaPaths) {
 				try {
+					console.log(`Importing: ${pathInfo.modulImportPath}`);
 					const module = await import(pathInfo.modulImportPath);
 					if (module.schema) {
 						schemas.push(module.schema);
+						console.log(`✓ Imported ${pathInfo.namespace} - ${pathInfo.schemaName}`);
 					}
 				} catch (importError: any) {
-					console.error(`Failed to import ${pathInfo.modulImportPath}:`, importError?.message || importError);
+					console.error(`✗ Failed to import ${pathInfo.modulImportPath}:`, importError?.message || importError);
 				}
 			}
 
@@ -75,7 +76,7 @@ export class MyMCP extends McpAgent {
 			const { filteredArrayOfSchemas } = FlowMCP
 				.filterArrayOfSchemas({
 					arrayOfSchemas: schemas,
-					includeNamespaces: ['coingecko-com', 'coinmarketcap-com', 'defilama'],
+					includeNamespaces: ['coingecko-com', 'defilama', 'dexscreener-com', 'honeypot', 'coinmarketcap-com'],
 					excludeNamespaces: [],
 					activateTags: []
 				})

@@ -8,6 +8,19 @@
 	"main": "src/index.ts",
 	"compatibility_date": "2025-03-10",
 	"compatibility_flags": ["nodejs_compat"],
+	"find_additional_modules": true,
+	"rules": [
+		{
+			"type": "ESModule",
+			"globs": ["node_modules/schemaimporter/schemas/**/*.mjs"],
+			"fallthrough": true
+		},
+		{
+			"type": "ESModule",
+			"globs": ["node_modules/schemaimporter/src/**/*.mjs"],
+			"fallthrough": true
+		}
+	],
 	"migrations": [
 		{
 			"new_sqlite_classes": ["MyMCP"],
