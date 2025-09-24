@@ -4,11 +4,7 @@ import { FlowMCP } from "flowmcp";
 import { SchemaImporter } from "schemaimporter";
 import { schema as pingSchema } from "../custom-schemas/ping.mjs";
 
-const arrayOfSchemas = await SchemaImporter.loadFromFolder({
-	excludeSchemasWithImports: true,
-	excludeSchemasWithRequiredServerParams: true,
-	addAdditionalMetaData: false,
-});
+
 
 
 // Define our MCP agent with tools
