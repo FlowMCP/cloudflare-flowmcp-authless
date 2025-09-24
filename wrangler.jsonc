@@ -12,7 +12,7 @@
 	"rules": [
 		{
 			"type": "ESModule",
-			"globs": ["node_modules/schemaimporter/schemas/**/*.mjs"],
+			"globs": ["node_modules/schemaimporter/schemas/**/**/*.mjs"],
 			"fallthrough": true
 		},
 		{
