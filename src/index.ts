@@ -40,72 +40,14 @@ export class MyMCP extends McpAgent {
 		};
 		console.log("Config:", config);
 
-		console.log("Starting schema import - using wrangler module rules for dynamic imports...");
-
-		let schemas = [];
-
-		try {
-			// Get schema paths with metadata using loadFromFolderWithImport
-			console.log("Loading schema paths...");
-			const schemaPaths = await (SchemaImporter as any)
-				.loadFromFolderWithImport({
-					outputType: 'onlyPath',
-					excludeSchemasWithImports: config.cfgSchemaImporter.excludeSchemasWithImports,
-					excludeSchemasWithRequiredServerParams: config.cfgSchemaImporter.excludeSchemasWithRequiredServerParams
-				});
-
-			console.log(`Found ${schemaPaths.length} schema paths`);
-
-			// Import schemas using modulImportPath (should work with wrangler module rules)
-			for (const pathInfo of schemaPaths) {
-				try {
-					console.log(`Importing: ${pathInfo.modulImportPath}`);
-					const module = await import(pathInfo.modulImportPath);
-					if (module.schema) {
-						schemas.push(module.schema);
-						console.log(`✓ Imported ${pathInfo.namespace} - ${pathInfo.schemaName}`);
-					}
-				} catch (importError: any) {
-					console.error(`✗ Failed to import ${pathInfo.modulImportPath}:`, importError?.message || importError);
-				}
-			}
-
-			console.log(`Successfully imported ${schemas.length} schemas`);
-
-			// Now use FlowMCP to filter the schemas
-			const { filteredArrayOfSchemas } = FlowMCP
-				.filterArrayOfSchemas({
-					arrayOfSchemas: schemas,
-					includeNamespaces: ['coingecko-com', 'defilama', 'dexscreener-com', 'honeypot', 'coinmarketcap-com'],
-					excludeNamespaces: [],
-					activateTags: []
-				})
-
-			console.log(`Filtered to ${filteredArrayOfSchemas.length} schemas`);
-
-			// Register filtered schemas
-			if (filteredArrayOfSchemas.length > 0) {
-				console.log("Registering schemas as MCP tools...");
-				for( const schema of filteredArrayOfSchemas ) {
-					console.log(`Registering schema: ${schema.name || schema.namespace || 'unknown'}`);
-					try {
-						FlowMCP.activateServerTools( {
-							server: this.server,
-							schema,
-							serverParams: []
-						} )
-					} catch (error) {
-						console.error(`Error registering schema:`, error);
-					}
-				}
-				console.log("Schema registration complete");
-			} else {
-				console.log("No matching schemas found after filtering");
-			}
-
-		} catch (error) {
-			console.error("Error during schema import process:", error);
-		}
+console.log( 'Prepare!!!')
+		const arrayOfSchemas = await (SchemaImporter as any)
+			.loadFromFolderWithImport({
+				outputType: 'onlySchema',
+				excludeSchemasWithImports: config.cfgSchemaImporter.excludeSchemasWithImports,
+				excludeSchemasWithRequiredServerParams: config.cfgSchemaImporter.excludeSchemasWithRequiredServerParams
+			});
+	console.log( 'Loaded schemas:', arrayOfSchemas.length )
 		
 
 
@@ -186,7 +128,7 @@ export class MyMCP extends McpAgent {
 
 
 		// Always register a basic ping tool for testing
-		this.server.tool("ping", {}, async () => ({
+		this.server.tool("ping6", {}, async () => ({
 			content: [{ type: "text", text: "pong - FlowMCP Server is running!" }],
 		}));
 
