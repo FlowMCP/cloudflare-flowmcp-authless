@@ -42,7 +42,7 @@ export class MyMCP extends McpAgent {
 
 console.log( 'Prepare!!!')
 		const arrayOfSchemas = await (SchemaImporter as any)
-			.loadFromFolderWithImport({
+			.loadFromFolder({
 				outputType: 'onlySchema',
 				excludeSchemasWithImports: config.cfgSchemaImporter.excludeSchemasWithImports,
 				excludeSchemasWithRequiredServerParams: config.cfgSchemaImporter.excludeSchemasWithRequiredServerParams
