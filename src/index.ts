@@ -30,6 +30,22 @@ export class MyMCP extends McpAgent {
 		};
 		console.log("Config:", config);
 /*
+		const arrayOfSchemas = await SchemaImporter
+			.loadFromFolder( {
+				excludeSchemasWithImports: true,
+				excludeSchemasWithRequiredServerParams: true,
+				addAdditionalMetaData: false
+			} )
+		
+		const { filteredArrayOfSchemas } = FlowMCP
+			.filterArrayOfSchemas( {
+				'arrayOfSchemas': arrayOfSchemas.map( ( { schema } ) => { return schema } ),
+				includeNamespaces: [],
+				excludeNamespaces: [],
+				activateTags: []
+			} )
+*/
+/*
 */
 /*
 		// Load schemas from folder
@@ -44,7 +60,7 @@ export class MyMCP extends McpAgent {
 				...config.cfgFilterArrayOfSchemas
 			});
 */
-		console.log("Filtered schemas:", filteredArrayOfSchemas);
+		// console.log("Filtered schemas:", filteredArrayOfSchemas);
 /*
 		FlowMCP
 			.activateServerTools( {
