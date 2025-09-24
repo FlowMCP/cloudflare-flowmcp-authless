@@ -1,7 +1,7 @@
 import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { FlowMCP } from "flowmcp";
-import { SchemaImporter } from "schemaimporter";
+import { arrayOfSchemaPaths } from "./schema-paths.mjs";
 import { schema as pingSchema } from "../custom-schemas/ping.mjs";
 
 
@@ -40,13 +40,14 @@ export class MyMCP extends McpAgent {
 			},
 		};
 		console.log("Config:", config);
-/*
-		const arrayOfSchemas = await SchemaImporter.loadFromFolder({
-			excludeSchemasWithImports: true,
-			excludeSchemasWithRequiredServerParams: true,
-			addAdditionalMetaData: false,
-		});
-*/
+
+		// Load schemas using dynamic imports (Cloudflare Workers compatible)
+		const arrayOfSchemas = await Promise.all(
+			arrayOfSchemaPaths.map(async (path) => {
+				const module = await import(path);
+				return { schema: module.schema, absolutePath: path };
+			})
+		);
 /*
 			FlowMCP.activateServerTools( {
 				server: this.server,
@@ -102,11 +103,11 @@ export class MyMCP extends McpAgent {
 			addAdditionalMetaData: false,
 		});
 */
-			FlowMCP.activateServerTools({
-				server: this.server,
-				schema: pingSchema,
-				serverParams: []
-			});
+		FlowMCP.activateServerTools({
+			server: this.server,
+			schema: pingSchema,
+			serverParams: []
+		});
 
 		this.server.tool("ping4", {}, async () => ({
 			content: [{ type: "text", text: "pong" }],
