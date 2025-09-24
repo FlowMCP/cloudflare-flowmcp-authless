@@ -37,12 +37,13 @@ export class MyMCP extends McpAgent {
 			},
 		};
 		console.log("Config:", config);
-
+/*
 		const arrayOfSchemas = await SchemaImporter.loadFromFolder({
 			excludeSchemasWithImports: true,
 			excludeSchemasWithRequiredServerParams: true,
 			addAdditionalMetaData: false,
 		});
+*/
 /*
 			FlowMCP.activateServerTools( {
 				server: this.server,
