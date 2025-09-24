@@ -2,15 +2,23 @@ import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { FlowMCP } from "flowmcp";
 
+// @ts-ignore - loadFromFolderStatic exists but no TypeScript definitions
 import { SchemaImporter } from 'schemaimporter'
 
 
 // Define our MCP agent with tools
 export class MyMCP extends McpAgent {
-	server = new McpServer({
-		name: "FlowMCP Schema Server",
-		version: "1.0.0",
-	});
+	private _server?: McpServer;
+
+	get server() {
+		if (!this._server) {
+			this._server = new McpServer({
+				name: "FlowMCP Schema Server",
+				version: "1.0.0",
+			});
+		}
+		return this._server;
+	}
 
 	async init() {
 		// Load environment configuration with defaults
@@ -40,6 +48,7 @@ export class MyMCP extends McpAgent {
 		console.log("Config:", config);
 
 		console.log( 'Start import...')
+		// @ts-ignore - loadFromFolderStatic exists but no TypeScript definitions
 		const arrayOfSchemas = await SchemaImporter
 			.loadFromFolderStatic( { 
 				excludeSchemasWithImports: true,
@@ -47,7 +56,7 @@ export class MyMCP extends McpAgent {
 				addAdditionalMetaData: false,
 				outputType: 'onlySchema' 
 			} )
- 
+ console.log( 'B')
 		const { filteredArrayOfSchemas } = FlowMCP
 			.filterArrayOfSchemas({
 				arrayOfSchemas,
@@ -55,8 +64,9 @@ export class MyMCP extends McpAgent {
 				excludeNamespaces: [],
 				activateTags: []
 			} )
- 
+ console.log( 'C')
 		for( const schema of filteredArrayOfSchemas ) {
+console.log( 'D' )
 			FlowMCP.activateServerTools({
 				server: this.server,
 				schema,
