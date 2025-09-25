@@ -60,10 +60,10 @@ describe('MyMCP', () => {
     it('should initialize with ping6 tool', async () => {
         await mcpInstance.init()
 
-        // Check that the ping6 tool was registered
+        // Check that the ping tool was registered
         const server = mcpInstance.server
         expect(server.tool).toHaveBeenCalledWith(
-            'ping6',
+            'ping',
             {},
             expect.any(Function)
         )
