@@ -84,7 +84,7 @@ export class MyMCP extends McpAgent {
 		console.log('Schema registration completed')
 
 		// Always register a basic ping tool for testing
-		this.server.tool("ping6", {}, async () => ({
+		this.server.tool("ping", {}, async () => ({
 			content: [{ type: "text", text: "pong - FlowMCP Server is running!" }],
 		}));
 	}
