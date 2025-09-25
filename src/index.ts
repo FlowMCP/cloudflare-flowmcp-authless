@@ -47,139 +47,46 @@ export class MyMCP extends McpAgent {
 		};
 		console.log("Config:", config);
 
-		console.log( 'Start import...')
+		// Load schemas using static import
 		// @ts-ignore - loadFromFolderStatic exists but no TypeScript definitions
 		const arrayOfSchemas = await SchemaImporter
 			.loadFromFolderStatic( {
-				excludeSchemasWithImports: true,
-				excludeSchemasWithRequiredServerParams: true,
-				addAdditionalMetaData: false,
+				excludeSchemasWithImports: config.cfgSchemaImporter.excludeSchemasWithImports,
+				excludeSchemasWithRequiredServerParams: config.cfgSchemaImporter.excludeSchemasWithRequiredServerParams,
+				addAdditionalMetaData: config.cfgSchemaImporter.addAdditionalMetaData,
 				outputType: 'onlySchema'
 			} )
-		console.log( 'B - arrayOfSchemas count:', arrayOfSchemas.length)
+		console.log(`Loaded ${arrayOfSchemas.length} schemas`)
 
+		// Filter schemas based on configuration
 		const { filteredArrayOfSchemas } = FlowMCP
 			.filterArrayOfSchemas({
 				arrayOfSchemas,
-				includeNamespaces: [],
-				excludeNamespaces: [],
-				activateTags: []
+				includeNamespaces: config.cfgFilterArrayOfSchemas.includeNamespaces,
+				excludeNamespaces: config.cfgFilterArrayOfSchemas.excludeNamespaces,
+				activateTags: config.cfgFilterArrayOfSchemas.activateTags
 			} )
- console.log( 'C - filteredArrayOfSchemas count:', filteredArrayOfSchemas.length)
+		console.log(`Filtered to ${filteredArrayOfSchemas.length} schemas`)
+
+		// Register schemas as MCP tools
 		for( const schema of filteredArrayOfSchemas ) {
-			console.log( 'D - Processing schema:', schema.namespace || 'unknown' )
 			try {
 				FlowMCP.activateServerTools({
 					server: this.server,
 					schema,
 					serverParams: []
 				} )
-				console.log( 'E - Schema activated successfully' )
 			} catch (error) {
-				console.error('Error activating schema:', error)
-				console.error('Error stack:', error.stack)
-				throw error
+				console.error(`Failed to activate schema ${schema.namespace}:`, error)
 			}
 		}
 
-		console.log( 'Import finished' )
-
-
-/*
-		// Load schemas using dynamic imports (Cloudflare Workers compatible)
-		const arrayOfSchemas = await Promise.all(
-			arrayOfSchemaPaths.map(async (path) => {
-				const module = await import(path);
-				return { schema: module.schema, absolutePath: path };
-			})
-		);
-*/
-
-		// const schema = await import( 'schemaimporter/schemas/v1.2.0/defilama/api.mjs' )
-/*
-		
-			FlowMCP.activateServerTools( {
-				server: this.server,
-				schema: arrayOfSchemas[0]['schema'],
-				serverParams: []
-			} );
-*/
-/*
-			FlowMCP.activateServerTools( {
-				server: this.server,
-				schema: arrayOfSchemas[0]['schema'],
-				serverParams: []
-			} );
-*/
-
-
-/*
-		const { filteredArrayOfSchemas } = FlowMCP.filterArrayOfSchemas({
-			arrayOfSchemas: arrayOfSchemas.map(({ schema }: any) => schema),
-			includeNamespaces: [],
-			excludeNamespaces: [],
-			activateTags: [],
-		});
-*/
-		/*
-		 */
-		/*
-		// Load schemas from folder
-		const arrayOfSchemas = await SchemaImporter
-			.loadFromFolder(config.cfgSchemaImporter);
-		console.log("Loaded schemas:", arrayOfSchemas);
-
-		// Filter schemas
-		const { filteredArrayOfSchemas } = FlowMCP
-			.filterArrayOfSchemas({
-				arrayOfSchemas: arrayOfSchemas.map(({ schema }: any) => schema),
-				...config.cfgFilterArrayOfSchemas
-			});
-*/
-		// console.log("Filtered schemas:", filteredArrayOfSchemas);
-		/*
-		FlowMCP
-			.activateServerTools( {
-				server: this.server,
-				schema: arrayOfSchemas[0]['schema'],
-				serverParams: []
-			} )
-*/
-/*
-		FlowMCP.activateServerTools({
-			server: this.server,
-			'schema': arrayOfSchemas[0]['schema'],
-			serverParams: []
-		});
-*/
-/*
-		const arrayOfSchemas = await SchemaImporter.loadFromFolder({
-			excludeSchemasWithImports: true,
-			excludeSchemasWithRequiredServerParams: true,
-			addAdditionalMetaData: false,
-		});
-*/
-
+		console.log('Schema registration completed')
 
 		// Always register a basic ping tool for testing
 		this.server.tool("ping6", {}, async () => ({
 			content: [{ type: "text", text: "pong - FlowMCP Server is running!" }],
 		}));
-
-		/*
-		// Register tools for each schema
-		console.log(`Registering tools for ${filteredArrayOfSchemas.length} schemas`);
-		for (const schema of filteredArrayOfSchemas) {
-			console.log(`Processing schema: ${schema.name}`);
-
-			FlowMCP.activateServerTools({
-				server: this.server,
-				schema,
-				serverParams: []
-			});
-		}
-*/
-		console.log("Tool registration completed");
 	}
 }
 
